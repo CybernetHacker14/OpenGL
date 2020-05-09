@@ -6,8 +6,5 @@ Debug/
 **.vcxproj.filters
 **.vcxproj.user
 
-# Other files
-**.png
-**.jpg
-**.css
-**.html
+# Misc
+Dependencies/GLEW/doc/
