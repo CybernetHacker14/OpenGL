@@ -18,6 +18,8 @@ void main(){
 
 uniform vec4 u_Color;
 uniform sampler2D u_Texture;
+uniform sampler2D u_Texture2;
+uniform int u_RenderChoice;
 
 layout(location = 0) out vec4 color;
 
@@ -25,5 +27,18 @@ in vec2 v_TexCoord;
 
 void main(){
 	vec4 texColor = texture(u_Texture, v_TexCoord);
-	color = texColor;
+	vec4 texColor2 = texture(u_Texture2, v_TexCoord);
+
+	if(u_RenderChoice == 1){
+		color = texColor;
+	}
+	else if(u_RenderChoice == 2){	
+		color = u_Color;
+	}
+	else if(u_RenderChoice == 3){
+		color = mix(texColor, texColor2, 0.2);
+	}
+	else if(u_RenderChoice == 4){
+		color = mix(texColor, texColor2, 0.2) * u_Color;
+	}
 }

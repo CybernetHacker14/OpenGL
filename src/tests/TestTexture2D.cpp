@@ -4,20 +4,23 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "imgui/imgui.h"
+#include <string>
 
 namespace test {
 	TestTexture2D::TestTexture2D()
-		:m_TranslationA(200, 200, 0), m_TranslationB(400, 200, 0),
-		m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)), // Projection Matrix
-		m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0))) // View Matrix
+		:m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)), // Projection Matrix
+		m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0))), // View Matrix
+		m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0))), // Model Matrix
+		m_MVP(m_Proj* m_View* m_Model), // The MVP Matrix. OpenGL expects multiplication in this order only.
+		m_RenderChoice{ 1 },
+		m_QuadColor{ 0.2f,0.3f,0.1f,1.0f }
 	{
 		// Vertex Data
 		float positions[] = {
-			-50.0f, -50.0f, 0.0f, 0.0f,// Vertex 0 (X,Y)
-			 50.0f, -50.0f, 1.0f, 0.0f,// Vertex 1 (X,Y)
-			 50.0f,  50.0f, 1.0f, 1.0f,// Vertex 2 (X,Y)
-			-50.0f,  50.0f, 0.0f, 1.0f// Vertex 3 (X,Y)
+			-100.0f, -100.0f, 0.0f, 0.0f,// Vertex 0 (X,Y)
+			 100.0f, -100.0f, 1.0f, 0.0f,// Vertex 1 (X,Y)
+			 100.0f,  100.0f, 1.0f, 1.0f,// Vertex 2 (X,Y)
+			-100.0f,  100.0f, 0.0f, 1.0f // Vertex 3 (X,Y)
 		};
 
 		// Index Data
@@ -50,9 +53,18 @@ namespace test {
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.shader");
 		m_Shader->Bind();
 
-		m_Texture = std::make_unique<Texture>("res/textures/test_texture.png");
+		m_Texture = std::make_unique<Texture>("res/textures/test_texture_2.jpg");
+		m_Texture_2 = std::make_unique<Texture>("res/textures/test_texture.png");
+
+		m_Texture->Bind(); // slot value of this should match the slot uniform value below
+		m_Texture_2->Bind(1);
 
 		m_Shader->SetUniform1i("u_Texture", 0);
+		m_Shader->SetUniform1i("u_Texture2", 1);
+
+		m_Shader->SetUniformMat4f("u_MVP", m_MVP);
+
+		m_Renderer = std::make_unique<Renderer>();
 	}
 
 	TestTexture2D::~TestTexture2D()
@@ -68,34 +80,28 @@ namespace test {
 		GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 		GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
-		Renderer renderer;
-
-		m_Texture->Bind(); // slot value of this should match the slot uniform value below
+		int renderChoice = 1;
 
 		{
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), m_TranslationA); // Model Matrix
-			glm::mat4 mvp = m_Proj * m_View * model; // The MVP Matrix. OpenGL expects multiplication in this order only.
-
-			m_Shader->Bind();
-			m_Shader->SetUniformMat4f("u_MVP", mvp);
-
-			renderer.Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
+			m_Shader->SetUniform4f("u_Color", m_QuadColor[0], m_QuadColor[1], m_QuadColor[2], m_QuadColor[3]);
+			m_Shader->SetUniform1i("u_RenderChoice", m_RenderChoice);
 		}
 
-		{
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), m_TranslationB); // Model Matrix
-			glm::mat4 mvp = m_Proj * m_View * model; // The MVP Matrix. OpenGL expects multiplication in this order only.
-
-			m_Shader->Bind();
-			m_Shader->SetUniformMat4f("u_MVP", mvp);
-
-			renderer.Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
-		}
+		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
 	}
 
 	void TestTexture2D::OnImGuiRender()
 	{
-		ImGui::SliderFloat2("Translation A", &m_TranslationA.x, 0.0f, 960.0f);
-		ImGui::SliderFloat2("Translation B", &m_TranslationB.x, 0.0f, 960.0f);
+		ImGui::ColorEdit4("Quad Color", m_QuadColor);
+		ImGui::Spacing();
+
+		if (ImGui::Button("Add a texture")) {
+			if (m_RenderChoice >= 4) {
+				m_RenderChoice = 1;
+			}
+			else {
+				m_RenderChoice++;
+			}
+		}
 	}
 }

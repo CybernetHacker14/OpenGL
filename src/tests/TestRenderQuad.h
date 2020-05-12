@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Test.h"
-#include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "IndexBuffer.h"
+#include "VertexBufferLayout.h"
+#include "Renderer.h"
 
-#include "glm/glm.hpp"
+#include "imgui/imgui.h"
+
+#include <memory>
 
 namespace test {
 	class TestRenderQuad : public Test {
@@ -18,14 +20,16 @@ namespace test {
 		void OnImGuiRender() override;
 
 	private:
+		std::unique_ptr<VertexArray> m_VAO;
+		std::unique_ptr<VertexBuffer> m_VBO;
+		std::unique_ptr<IndexBuffer> m_IBO;
+		std::unique_ptr<Shader> m_Shader;
+		std::unique_ptr<Renderer> m_Renderer;
+
 		float m_QuadColor[4];
-		float m_Positions[16];
 
-		float m_Indices[6];
+		glm::mat4 m_Proj, m_View, m_Model, m_MVP;
 
-		glm::vec2 m_VertexPos1;
-		glm::vec2 m_VertexPos2;
-		glm::vec2 m_VertexPos3;
-		glm::vec2 m_VertexPos4;
+		glm::vec2 m_Vertex1, m_Vertex2, m_Vertex3, m_Vertex4;
 	};
 }

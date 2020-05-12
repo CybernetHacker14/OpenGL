@@ -11,16 +11,10 @@
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestRenderQuad.h"
+#include "tests/TestTransformation2D.h"
 
 int main(void)
 {
-	float positions[] = {
-		-50.0f, -50.0f, 0.0f, 0.0f,// Vertex 0 (X,Y)
-		 50.0f, -50.0f, 1.0f, 0.0f,// Vertex 1 (X,Y)
-		 50.0f,  50.0f, 1.0f, 1.0f,// Vertex 2 (X,Y)
-		-50.0f,  50.0f, 0.0f, 1.0f // Vertex 3 (X,Y)
-	};
-
 	GLFWwindow* window;
 
 	/* Initialize the library */
@@ -73,7 +67,9 @@ int main(void)
 		currentTest = testMenu;
 
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+		testMenu->RegisterTest<test::TestRenderQuad>("Render Quad");
 		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
+		testMenu->RegisterTest<test::TestTransformation2D>("2D Transformations");
 
 		while (!glfwWindowShouldClose(window))
 		{

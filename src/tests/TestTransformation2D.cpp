@@ -1,24 +1,25 @@
-#include "TestRenderQuad.h"
+#include "TestTransformation2D.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace test {
-	TestRenderQuad::TestRenderQuad()
-		: m_QuadColor{ 0.2f,0.3f,0.1f,1.0f },
+	TestTransformation2D::TestTransformation2D()
+		:m_Translation(400, 200, 0),
 		m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)),
 		m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0))),
-		m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0))),
-		m_MVP(m_Proj* m_View* m_Model),
-		m_Vertex1{ -100.0f, -100.0f }, m_Vertex2{ 100.0f, -100.0f },
-		m_Vertex3{ 100.0f, 100.0f }, m_Vertex4{ -100.0f, 100.0f }
+		m_Model(glm::translate(glm::mat4(1.0f), m_Translation)),
+		m_MVP{ m_Proj * m_View * m_Model },
+		m_QuadColor{ 0.2f,0.3f,0.4f,1.0f },
+		m_Rotate{ 1.0f }, m_Scale{ 1.0f }
 	{
 		// Vertex Data
 		float positions[] = {
-			m_Vertex1.x, m_Vertex1.y,
-			m_Vertex2.x, m_Vertex2.y,
-			m_Vertex3.x, m_Vertex3.y,
-			m_Vertex4.x, m_Vertex4.y
+			-100.0f, -100.0f,
+			 100.0f, -100.0f,
+			 100.0f,  100.0f,
+			-100.0f,  100.0f
 		};
 
 		// Index Data
@@ -38,7 +39,7 @@ namespace test {
 
 		// Create a layout for OpenGL to read data from VertexBuffer properly
 		VertexBufferLayout layout;
-		layout.Push<float>(2); // Two float values as one single 2d-position for vertex
+		layout.Push<float>(2);
 
 		// Add the buffer and the vertex layout to the vertex array object
 		m_VAO->AddBuffer(*m_VBO, layout);
@@ -50,33 +51,41 @@ namespace test {
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.shader");
 		m_Shader->Bind();
 
-		m_Shader->SetUniformMat4f("u_MVP", m_MVP);
 		m_Shader->SetUniform1i("u_RenderChoice", 2);
 
 		m_Renderer = std::make_unique<Renderer>();
 	}
 
-	TestRenderQuad::~TestRenderQuad()
+	TestTransformation2D::~TestTransformation2D()
 	{
 	}
 
-	void TestRenderQuad::OnUpdate(float deltaTime)
+	void TestTransformation2D::OnUpdate(float deltaTime)
 	{
+		m_Model = glm::translate(glm::mat4(1.0f), *&m_Translation);
+		m_Model = glm::rotate(m_Model, glm::radians(*&m_Rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+		m_Model = glm::scale(m_Model, glm::vec3(*&m_Scale, *&m_Scale, 0.0f));
+
+		m_MVP = m_Proj * m_View * m_Model;
 	}
 
-	void TestRenderQuad::OnRender()
+	void TestTransformation2D::OnRender()
 	{
 		GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 		GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
+		m_Shader->SetUniformMat4f("u_MVP", m_MVP);
 		m_Shader->SetUniform4f("u_Color", m_QuadColor[0], m_QuadColor[1], m_QuadColor[2], m_QuadColor[3]);
 
 		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
 	}
 
-	void TestRenderQuad::OnImGuiRender()
+	void TestTransformation2D::OnImGuiRender()
 	{
 		ImGui::ColorEdit4("Quad Color", m_QuadColor);
 		ImGui::Spacing();
+		ImGui::SliderFloat2("Translation", &m_Translation.x, 0.0f, 960.0f);
+		ImGui::SliderFloat("Rotation", &m_Rotate, 0.0f, 360.0f);
+		ImGui::SliderFloat("Scaling", &m_Scale, 0.0f, 10.0f);
 	}
 }

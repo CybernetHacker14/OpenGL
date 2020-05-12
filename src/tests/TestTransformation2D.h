@@ -3,7 +3,6 @@
 #include "Test.h"
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "Texture.h"
 #include "Renderer.h"
 
 #include "imgui/imgui.h"
@@ -11,10 +10,10 @@
 #include <memory>
 
 namespace test {
-	class TestTexture2D : public Test {
+	class TestTransformation2D : public Test {
 	public:
-		TestTexture2D();
-		~TestTexture2D();
+		TestTransformation2D();
+		~TestTransformation2D();
 
 		void OnUpdate(float deltaTime) override;
 		void OnRender() override;
@@ -25,12 +24,13 @@ namespace test {
 		std::unique_ptr<VertexBuffer> m_VBO;
 		std::unique_ptr<IndexBuffer> m_IBO;
 		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<Texture> m_Texture, m_Texture_2;
 		std::unique_ptr<Renderer> m_Renderer;
 
 		glm::mat4 m_Proj, m_View, m_Model, m_MVP;
 
-		int m_RenderChoice;
+		glm::vec3 m_Translation;
+
+		float m_Rotate, m_Scale;
 
 		float m_QuadColor[4];
 	};
