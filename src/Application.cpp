@@ -12,6 +12,8 @@
 #include "tests/TestTexture2D.h"
 #include "tests/TestRenderQuad.h"
 #include "tests/TestTransformation2D.h"
+#include "tests/TestCameraControls2D.h"
+#include "tests/TestPerspective3D.h"
 
 int main(void)
 {
@@ -27,7 +29,7 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(960, 540, "OpenGL Tutorial", NULL, NULL);
+	window = glfwCreateWindow(1920, 1080, "OpenGL Tutorial", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -70,6 +72,8 @@ int main(void)
 		testMenu->RegisterTest<test::TestRenderQuad>("Render Quad");
 		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
 		testMenu->RegisterTest<test::TestTransformation2D>("2D Transformations");
+		testMenu->RegisterTest<test::TestCameraControls2D>("2D Camera Controls");
+		testMenu->RegisterTest<test::TestPerspective3D>("3D Perspective");
 
 		while (!glfwWindowShouldClose(window))
 		{

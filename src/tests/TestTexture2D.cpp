@@ -8,10 +8,10 @@
 
 namespace test {
 	TestTexture2D::TestTexture2D()
-		:m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)), // Projection Matrix
-		m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0))), // View Matrix
-		m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0))), // Model Matrix
-		m_MVP(m_Proj* m_View* m_Model), // The MVP Matrix. OpenGL expects multiplication in this order only.
+		:m_Proj{ glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) }, // Projection Matrix
+		m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) }, // View Matrix
+		m_Model{ glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0)) }, // Model Matrix
+		m_MVP{ m_Proj * m_View * m_Model }, // The MVP Matrix. OpenGL expects multiplication in this order only.
 		m_RenderChoice{ 1 },
 		m_QuadColor{ 0.2f,0.3f,0.1f,1.0f }
 	{
