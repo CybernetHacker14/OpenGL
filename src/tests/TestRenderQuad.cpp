@@ -6,10 +6,10 @@
 namespace test {
 	TestRenderQuad::TestRenderQuad()
 		: m_QuadColor{ 0.2f,0.3f,0.1f,1.0f },
-		m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)),
-		m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0))),
-		m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0))),
-		m_MVP(m_Proj* m_View* m_Model),
+		m_Proj{ glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) },
+		m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) },
+		m_Model{ glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0)) },
+		m_MVP{ m_Proj * m_View * m_Model },
 		m_Vertex1{ -100.0f, -100.0f }, m_Vertex2{ 100.0f, -100.0f },
 		m_Vertex3{ 100.0f, 100.0f }, m_Vertex4{ -100.0f, 100.0f }
 	{
@@ -29,6 +29,8 @@ namespace test {
 
 		GLCALL(glEnable(GL_BLEND));
 		GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		GLCALL(glDisable(GL_DEPTH_TEST));
 
 		// Vertex Array Object
 		m_VAO = std::make_unique<VertexArray>();

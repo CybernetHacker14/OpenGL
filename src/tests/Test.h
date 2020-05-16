@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ErrorManager.h"
+
 #include <functional>
 #include <vector>
 #include <string>

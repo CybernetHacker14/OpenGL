@@ -6,10 +6,10 @@
 
 namespace test {
 	TestCameraControls2D::TestCameraControls2D()
-		:m_Translation(0, 0, 0),
-		m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)),
-		m_View(glm::translate(glm::mat4(1.0f), m_Translation)),
-		m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0))),
+		:m_Translation{ 0, 0, 0 },
+		m_Proj{ glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f) },
+		m_View{ glm::translate(glm::mat4(1.0f), m_Translation) },
+		m_Model{ glm::translate(glm::mat4(1.0f), glm::vec3(400, 200, 0)) },
 		m_MVP{ m_Proj * m_View * m_Model },
 		m_QuadColor{ 0.2f,0.3f,0.4f,1.0f }
 	{
@@ -29,6 +29,8 @@ namespace test {
 
 		GLCALL(glEnable(GL_BLEND));
 		GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		GLCALL(glDisable(GL_DEPTH_TEST));
 
 		// Vertex Array Object
 		m_VAO = std::make_unique<VertexArray>();
@@ -80,6 +82,6 @@ namespace test {
 	{
 		ImGui::ColorEdit4("Quad Color", m_QuadColor);
 		ImGui::Spacing();
-		ImGui::SliderFloat2("Move Camera", &m_Translation.x, 0.0f, 960.0f);
+		ImGui::SliderFloat3("Move Camera", &m_Translation.x, -10.0f, 10.0f);
 	}
 }

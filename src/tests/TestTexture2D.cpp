@@ -1,5 +1,4 @@
 #include "TestTexture2D.h"
-#include "ErrorManager.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -31,6 +30,8 @@ namespace test {
 
 		GLCALL(glEnable(GL_BLEND));
 		GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		GLCALL(glDisable(GL_DEPTH_TEST));
 
 		// Vertex Array Object
 		m_VAO = std::make_unique<VertexArray>();
@@ -82,10 +83,8 @@ namespace test {
 
 		int renderChoice = 1;
 
-		{
-			m_Shader->SetUniform4f("u_Color", m_QuadColor[0], m_QuadColor[1], m_QuadColor[2], m_QuadColor[3]);
-			m_Shader->SetUniform1i("u_RenderChoice", m_RenderChoice);
-		}
+		m_Shader->SetUniform4f("u_Color", m_QuadColor[0], m_QuadColor[1], m_QuadColor[2], m_QuadColor[3]);
+		m_Shader->SetUniform1i("u_RenderChoice", m_RenderChoice);
 
 		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
 	}

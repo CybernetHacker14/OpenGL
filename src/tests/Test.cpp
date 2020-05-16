@@ -3,7 +3,7 @@
 
 namespace test {
 	TestMenu::TestMenu(Test*& currentTestPointer)
-		:m_CurrentTest(currentTestPointer)
+		:m_CurrentTest{ currentTestPointer }
 	{
 	}
 
