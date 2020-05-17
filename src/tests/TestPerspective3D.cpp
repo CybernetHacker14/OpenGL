@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <string>
+
 #include "imgui/imgui.h"
 
 namespace test {
@@ -11,7 +13,7 @@ namespace test {
 		m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.0f)) },
 		m_Model{ glm::translate(glm::mat4(1.0f), glm::vec3(-1, 0, 0)) },
 		m_MVP{ m_Proj * m_View * m_Model },
-		m_CamTranslation{ 0,0,7 }, m_CamRotate{ 23,45,0 }
+		m_CamTranslation{ 0,0,7 }, m_CamRotate{ 23,45,0 }, m_RenderChoice{ 1 }
 	{
 		// Vertex Data
 		float positions[] = {
@@ -82,15 +84,21 @@ namespace test {
 		m_IBO = std::make_unique<IndexBuffer>(indices, 6 * 5);
 
 		// Create and Compile shader from location and Bind
-		m_Shader = std::make_unique<Shader>("res/shaders/Basic.shader");
+		m_Shader = std::make_unique<Shader>("res/shaders/Grunge.shader");
 		m_Shader->Bind();
 
-		m_Texture = std::make_unique<Texture>("res/textures/crate2_diffuse.png");
+		m_CrateTexture = std::make_unique<Texture>("res/textures/crate2_diffuse.png");
+		m_DirtTexture = std::make_unique<Texture>("res/textures/dirt_diffuse.jpg");
+		m_MaskTexture = std::make_unique<Texture>("res/textures/grunge/grunge2.png");
 
-		m_Texture->Bind(); // slot value of this should match the slot uniform value below
+		m_CrateTexture->Bind(); // slot value of this should match the slot uniform value below
+		m_DirtTexture->Bind(1);
+		m_MaskTexture->Bind(2);
 
-		m_Shader->SetUniform1i("u_Texture", 0);
-		m_Shader->SetUniform1i("u_RenderChoice", 1);
+		m_Shader->SetUniform1i("crateTexture", 0);
+		m_Shader->SetUniform1i("dirtTexture", 1);
+		m_Shader->SetUniform1i("maskTexture", 2);
+		m_Shader->SetUniform1i("renderChoice", 1);
 
 		m_Renderer = std::make_unique<Renderer>();
 	}
@@ -117,14 +125,29 @@ namespace test {
 		GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		m_Shader->SetUniformMat4f("u_MVP", m_MVP);
+		m_Shader->SetUniform1i("renderChoice", m_RenderChoice);
 
 		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
 	}
 
 	void TestPerspective3D::OnImGuiRender()
 	{
+		ImGui::Text("Render Choice: %i", m_RenderChoice);
+		ImGui::Spacing();
+
 		ImGui::SliderFloat3("Cam Translation", &m_CamTranslation.x, -10.0f, 10.0f);
 		ImGui::Spacing();
+
 		ImGui::SliderFloat3("Cam Rotation", &m_CamRotate.x, -360.0f, 360.0f);
+		ImGui::Spacing();
+
+		if (ImGui::Button("Change Dirt Render")) {
+			if (m_RenderChoice >= 2) {
+				m_RenderChoice = 1;
+			}
+			else {
+				m_RenderChoice++;
+			}
+		}
 	}
 }

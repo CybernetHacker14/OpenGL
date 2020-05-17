@@ -23,12 +23,16 @@ namespace test {
 		std::unique_ptr<VertexBuffer> m_VBO;
 		std::unique_ptr<IndexBuffer> m_IBO;
 		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<Texture> m_Texture;
+		std::unique_ptr<Texture> m_CrateTexture;
+		std::unique_ptr<Texture> m_DirtTexture;
+		std::unique_ptr<Texture> m_MaskTexture;
 
 		std::unique_ptr<Renderer> m_Renderer;
 
 		glm::mat4 m_Proj, m_View, m_Model, m_MVP;
 
 		glm::vec3 m_CamTranslation, m_CamRotate;
+
+		int m_RenderChoice;
 	};
 }
