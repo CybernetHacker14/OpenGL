@@ -1,4 +1,4 @@
-#include "TestPerspective3D.h"
+#include "TestCameraControls3D.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -8,12 +8,11 @@
 #include <imgui/imgui.h>
 
 namespace test {
-	TestPerspective3D::TestPerspective3D()
-		:m_Proj{ glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 0.1f, 100.0f) },
-		m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.0f)) },
+	TestCameraControls3D::TestCameraControls3D()
+		:m_Proj{ glm::perspective(glm::radians(45.0f), 1920.0f / 1080.f, 0.1f, 50.0f) },
+		m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3)) },
 		m_Model{ glm::translate(glm::mat4(1.0f), glm::vec3(-1, 0, 0)) },
-		m_MVP{ m_Proj * m_View * m_Model },
-		m_CamTranslation{ 0,0,7 }, m_CamRotate{ 23,45,0 }, m_RenderChoice{ 1 }
+		m_MVP{ m_Proj * m_View * m_Model }
 	{
 		// Vertex Data
 		float positions[] = {
@@ -74,8 +73,8 @@ namespace test {
 
 		// Create a layout for OpenGL to read data from VertexBuffer properly
 		VertexBufferLayout layout;
-		layout.Push<float>(3); // Three float values as one single 3d-position for vertex
-		layout.Push<float>(2); // Two float values as texture co-ordinates per vertex
+		layout.Push<float>(3);
+		layout.Push<float>(2);
 
 		// We add the vertex buffer and the layout to the vertex array object
 		m_VAO->AddBuffer(*m_VBO, layout);
@@ -88,66 +87,42 @@ namespace test {
 		m_Shader->Bind();
 
 		m_CrateTexture = std::make_unique<Texture>("res/textures/crate2_diffuse.png");
-		m_DirtTexture = std::make_unique<Texture>("res/textures/dirt_diffuse.jpg");
+		m_DirtTexture = std::make_unique<Texture>("res/textures/dirt_diffuse.png");
 		m_MaskTexture = std::make_unique<Texture>("res/textures/grunge/grunge2.png");
 
-		m_CrateTexture->Bind(); // slot value of this should match the slot uniform value below
+		m_CrateTexture->Bind();
 		m_DirtTexture->Bind(1);
 		m_MaskTexture->Bind(2);
 
 		m_Shader->SetUniform1i("crateTexture", 0);
 		m_Shader->SetUniform1i("dirtTexture", 1);
 		m_Shader->SetUniform1i("maskTexture", 2);
+
 		m_Shader->SetUniform1i("renderChoice", 1);
 
 		m_Renderer = std::make_unique<Renderer>();
 	}
 
-	TestPerspective3D::~TestPerspective3D()
+	TestCameraControls3D::~TestCameraControls3D()
 	{
 	}
 
-	void TestPerspective3D::OnUpdate(float deltaTime)
+	void TestCameraControls3D::OnUpdate(float deltaTime)
 	{
-		m_View = glm::translate(glm::mat4(1.0f), m_CamTranslation * (-1.0f));
-		m_View = glm::rotate(m_View, glm::radians(m_CamRotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		m_View = glm::rotate(m_View, glm::radians(m_CamRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		m_View = glm::rotate(m_View, glm::radians(m_CamRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-		m_Model = glm::rotate(m_Model, deltaTime + glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-
 		m_MVP = m_Proj * m_View * m_Model;
 	}
 
-	void TestPerspective3D::OnRender()
+	void TestCameraControls3D::OnRender()
 	{
 		GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 		GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		m_Shader->SetUniformMat4f("u_MVP", m_MVP);
-		m_Shader->SetUniform1i("renderChoice", m_RenderChoice);
 
-		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader); // Draw Call
+		m_Renderer->Draw(*m_VAO, *m_IBO, *m_Shader);
 	}
 
-	void TestPerspective3D::OnImGuiRender()
+	void TestCameraControls3D::OnImGuiRender()
 	{
-		ImGui::Text("Render Choice: %i", m_RenderChoice);
-		ImGui::Spacing();
-
-		ImGui::SliderFloat3("Cam Translation", &m_CamTranslation.x, -10.0f, 10.0f);
-		ImGui::Spacing();
-
-		ImGui::SliderFloat3("Cam Rotation", &m_CamRotate.x, -360.0f, 360.0f);
-		ImGui::Spacing();
-
-		if (ImGui::Button("Toggle Dirt")) {
-			if (m_RenderChoice >= 2) {
-				m_RenderChoice = 1;
-			}
-			else {
-				m_RenderChoice++;
-			}
-		}
 	}
 }

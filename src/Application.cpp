@@ -14,6 +14,7 @@
 #include "tests/TestTransformation2D.h"
 #include "tests/TestCameraControls2D.h"
 #include "tests/TestPerspective3D.h"
+#include "tests/TestCameraControls3D.h"
 
 int main(void)
 {

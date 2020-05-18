@@ -9,10 +9,10 @@
 #include <memory>
 
 namespace test {
-	class TestPerspective3D :public Test {
+	class TestCameraControls3D : public Test {
 	public:
-		TestPerspective3D();
-		~TestPerspective3D();
+		TestCameraControls3D();
+		~TestCameraControls3D();
 
 		void OnUpdate(float deltaTime) override;
 		void OnRender() override;
@@ -31,9 +31,5 @@ namespace test {
 		std::unique_ptr<Renderer> m_Renderer;
 
 		glm::mat4 m_Proj, m_View, m_Model, m_MVP;
-
-		glm::vec3 m_CamTranslation, m_CamRotate;
-
-		int m_RenderChoice;
 	};
 }
