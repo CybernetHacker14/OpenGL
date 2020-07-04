@@ -2,10 +2,7 @@
 .vs/
 Debug/
 Release/
-**.sln
-**.vcxproj
-**.vcxproj.filters
-**.vcxproj.user
+*.user
 
 # Misc
 Dependencies/GLEW/doc/
